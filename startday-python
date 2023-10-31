@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DAY="$1"
+
+re='^[0-9]+$'
+if ! [[ $DAY =~ $re ]] ; then
+   echo "Error: Not a number" >&2; exit 1
+fi
+
+if test -f "day${DAY}.py"; then
+   echo "Error: day${DAY}.py already exists !" >&2; exit 2
+fi
+
+echo "Starting Day ${DAY}"
+touch input/input-day${DAY}.txt
+cp template.py.txt python/day${DAY}.py
+sed -i "s/{DAY}/${DAY}/" python/day${DAY}.py
+
+echo ""
+echo "Created day${DAY}.py, input-day${DAY}.txt"
+echo ""

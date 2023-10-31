@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "aoc.h"
+
+// Advent Of Code - Day %DAY%.
+
+#define DAY             %DAY%
+
+#define MAX_LINES       3000
+#define MAX_LINE_LENGTH 10
+
+void part_a();
+void part_b();
+
+char** lines;
+int line_count = 0;
+int* numbers;
+
+void main()
+{
+    start_day(DAY);
+
+    lines = read_input(DAY, "../input/", MAX_LINES, MAX_LINE_LENGTH, &line_count);
+    if (lines == NULL)
+    {
+        perror("read_input()");
+        return;
+    }
+
+    numbers = convert_input_to_numbers(lines, line_count);
+
+    part_a();
+    part_b();
+
+    free(numbers);
+    free_input(lines, line_count);
+}
+
+void part_a()
+{
+    start_part_a();
+
+    int answer = 0;
+
+    // Write code for part A here
+
+    for (int i = 0; i < line_count; ++i)
+    {
+        answer += numbers[i];
+        answer += strlen(lines[i]);
+    }
+
+    show_answer(answer);
+}
+
+void part_b()
+{
+    start_part_b();
+
+    int answer = 0;
+
+    // Write code for part B here
+
+    for (int i = 0; i < line_count; ++i)
+    {
+        answer += numbers[i];
+    }
+
+    show_answer(answer);
+}

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DAY="$1"
+
+re='^[0-9]+$'
+if ! [[ $DAY =~ $re ]] ; then
+   echo "Error: Not a number" >&2; exit 1
+fi
+
+if test -f "python/day${DAY}.py"; then
+   git add python/day${DAY}.py
+fi
+
+if test -f "c/day${DAY}.c"; then
+   git add c/day${DAY}.c
+fi
+
+if test -f "input/input-day${DAY}.txt"; then
+   git add input/input-day${DAY}.txt
+fi
+
+git commit -m "Day ${DAY} (WIP)"
+
