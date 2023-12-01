@@ -53,6 +53,39 @@ class Day1Solution(Aoc):
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
         return 281
 
+    def ReplaceWords(self, line: str) -> str:
+        words = ["????", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+        result = ""
+        ix = 0
+        while ix < len(line):
+            foundw = False
+            for wix, word in enumerate(words):
+                if line[ix:ix + len(word)] == word:
+                    result += str(wix)
+                    foundw = True
+                    ix += len(word)
+                    break
+            if foundw == False:
+                result += line[ix]
+                ix += 1
+
+        result2 = ""
+        ix = len(line) -1
+        while ix >= 0:
+            foundw = False
+            for wix, word in enumerate(words):
+                if line[ix:ix + len(word)] == word:
+                    result2 = str(wix) + result2
+                    foundw = True
+                    ix -= 1
+                    break
+            if foundw == False:
+                result2 = line[ix] + result2
+                ix -= 1
+        # print(result, result2)
+        # a = input()
+        return result + result2
+
     def PartA(self):
         self.StartPartA()
 
@@ -66,9 +99,17 @@ class Day1Solution(Aoc):
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
+        answer = 0
+        for line in self.inputdata:
+            # print(line)
+            newline = self.ReplaceWords(line)
+            # print(newline)
+            # a = input()
+            # print("")
+            newline2 = [ch for ch in newline if ord(ch) >= 48 and ord(ch) <= 57]
+            answer += int(newline2[0] + newline2[-1])
 
-        answer = None
+        # Attempt 1: 54978 is too low
 
         self.ShowAnswer(answer)
 
