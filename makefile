@@ -17,4 +17,4 @@ startday-c.o: startday-c.c
 #############################################
 
 clean:
-	rm *.o
+	rm -v *.o startday-c
