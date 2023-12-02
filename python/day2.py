@@ -36,6 +36,12 @@ class Game():
 
         return True
 
+    def CalcPower(self) -> int:
+        r = max([s[0] for s in self.sets])
+        g = max([s[1] for s in self.sets])
+        b = max([s[2] for s in self.sets])
+        return r *g * b
+
 
 class Day2Solution(Aoc):
 
@@ -71,15 +77,8 @@ class Day2Solution(Aoc):
 
     def TestDataB(self):
         self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 2286
 
     def ParseInput(self):
         games = []
@@ -104,9 +103,10 @@ class Day2Solution(Aoc):
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
-
-        answer = None
+        answer = 0
+        games = self.ParseInput()
+        for game in games:
+            answer += game.CalcPower()
 
         self.ShowAnswer(answer)
 
