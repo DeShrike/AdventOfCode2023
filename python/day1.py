@@ -67,7 +67,7 @@ class Day1Solution(Aoc):
                 ix += 1
 
         result2 = ""
-        ix = len(line) -1
+        ix = len(line) - 1
         while ix >= 0:
             foundw = False
             for wix, word in enumerate(words):
@@ -79,8 +79,7 @@ class Day1Solution(Aoc):
             if foundw == False:
                 result2 = line[ix] + result2
                 ix -= 1
-        # print(result, result2)
-        # a = input()
+
         return result + result2
 
     def PartA(self):
@@ -98,15 +97,12 @@ class Day1Solution(Aoc):
 
         answer = 0
         for line in self.inputdata:
-            # print(line)
             newline = self.ReplaceWords(line)
-            # print(newline)
-            # a = input()
-            # print("")
             newline2 = [ch for ch in newline if ord(ch) >= 48 and ord(ch) <= 57]
             answer += int(newline2[0] + newline2[-1])
 
         # Attempt 1: 54978 is too low
+        # Attempt 2: 54985 is correct
 
         self.ShowAnswer(answer)
 
