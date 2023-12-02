@@ -1,7 +1,4 @@
 from aoc import Aoc
-import itertools
-import math
-import re
 import sys
 
 # Day 1
