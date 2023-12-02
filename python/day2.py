@@ -40,7 +40,7 @@ class Game():
         r = max([s[0] for s in self.sets])
         g = max([s[1] for s in self.sets])
         b = max([s[2] for s in self.sets])
-        return r *g * b
+        return r * g * b
 
 
 class Day2Solution(Aoc):
@@ -81,19 +81,13 @@ class Day2Solution(Aoc):
         return 2286
 
     def ParseInput(self):
-        games = []
-        for line in self.inputdata:
-            games.append(Game(line))
-        return games
+        return [Game(line) for line in self.inputdata]
 
     def PartA(self):
         self.StartPartA()
 
-        answer = 0
         games = self.ParseInput()
-        for game in games:
-            if game.NotMoreThan(12, 0) and game.NotMoreThan(13, 1) and game.NotMoreThan(14, 2):
-                answer += game.id
+        answer = sum([game.id for game in games if game.NotMoreThan(12, 0) and game.NotMoreThan(13, 1) and game.NotMoreThan(14, 2)])
 
         # Attempt 1: 1715 is too low
         # Attempt 2: 2061 is correct
@@ -103,10 +97,8 @@ class Day2Solution(Aoc):
     def PartB(self):
         self.StartPartB()
 
-        answer = 0
         games = self.ParseInput()
-        for game in games:
-            answer += game.CalcPower()
+        answer = sum([game.CalcPower() for game in games])
 
         self.ShowAnswer(answer)
 
