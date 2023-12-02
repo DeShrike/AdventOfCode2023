@@ -1,21 +1,51 @@
 #!/bin/bash
 
 DAY="$1"
+YEAR="2023"
 
 re='^[0-9]+$'
 if ! [[ $DAY =~ $re ]] ; then
    echo "Error: Not a number" >&2; exit 1
 fi
 
-if test -f "day${DAY}.py"; then
+if test -f "python/day${DAY}.py"; then
    echo "Error: day${DAY}.py already exists !" >&2; exit 2
 fi
 
-echo "Starting Day ${DAY}"
-touch input/input-day${DAY}.txt
+echo "Starting Day ${DAY} - ${YEAR}"
+
+# get session cookie from file if .session exists
+if [[ -f ".session" ]]; then
+  AOC_SESSION=$(<".session")
+fi
+
+# validate session cookie
+if [ -z "$AOC_SESSION" ]; then
+    echo "AOC_SESSION isn't set." >&2
+    echo "Take session cookie from browser and add it to file .session" >&2
+    SES = 0
+fi
+
+VALIDSESSION=$(curl -s "https://adventofcode.com/${YEAR}/day/${DAY}/input" --cookie "session=${AOC_SESSION}")
+if [[ $VALIDSESSION =~ "Puzzle inputs differ by user." ]] || [[ $VALIDSESSION =~ "500 Internal Server" ]]; then
+    echo "Invalid AOC_SESSION." >&2
+    echo "Inputfile will not be downloaded !" >&2
+    SES = 0
+fi
+
+if ! [[ $SES == '0' ]]; then
+   echo "Downloading https://adventofcode.com/${YEAR}/day/${DAY}/input"
+   curl -s "https://adventofcode.com/${YEAR}/day/${DAY}/input" --cookie "session=${AOC_SESSION}" -o input/input-day${DAY}.txt
+fi
+
+if [[ $SES == '0' ]]; then
+   touch input/input-day${DAY}.txt
+fi
+
 cp template.py.txt python/day${DAY}.py
 sed -i "s/{DAY}/${DAY}/" python/day${DAY}.py
 
 echo ""
 echo "Created day${DAY}.py, input-day${DAY}.txt"
 echo ""
+

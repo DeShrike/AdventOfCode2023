@@ -10,6 +10,7 @@ __pycache__/
 *.o
 nohup.out
 startday-c
+.session
 
 # Distribution / packaging
 .Python
