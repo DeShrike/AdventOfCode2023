@@ -80,6 +80,7 @@ class Day3Solution(Aoc):
                 else:
                     if n is not None:
                         n = None
+            n = None
 
         for num in numbers:
             for nx, ny in self.Neighbours(num.x, num.y, len(num.number), w, h):
