@@ -37,3 +37,6 @@ def dirange(start, end=None, step:int=1):
         yield from range(start, end + 1, step)
     else:
         yield from range(start, end - 1, -step)
+
+def isingrid(x: int, y: int, width: int, height: int):
+    return x >= 0 and x < width and y >= 0 and y < height
