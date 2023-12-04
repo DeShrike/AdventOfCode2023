@@ -1,7 +1,7 @@
 from aoc import Aoc
+from utilities import dirange
 import itertools
 import math
-import re
 import sys
 
 # Day 4
@@ -42,15 +42,8 @@ class Day4Solution(Aoc):
 
     def TestDataB(self):
         self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 30
 
     def ParseInput(self):
         cards = []      # [(id, winning, have), ...]
@@ -78,9 +71,19 @@ class Day4Solution(Aoc):
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
+        cards = self.ParseInput()
+        counts = [1 for _ in range(len(cards))]
+        for ix, card in enumerate(cards):
+            same = set(card[2]).intersection(set(card[1]))
+            if len(same) > 0:
+                count = counts[ix]
+                # print(f"Card {card[0]} => Same {len(same)} |  Adding {count}  cards {ix + 2} .. {ix + len(same) + 1} ")
+                for a in dirange(ix + 1, ix + len(same)):
+                    counts[a] += (count)
+                # print(counts)
+                # aa = input()
 
-        answer = None
+        answer = sum(counts)
 
         self.ShowAnswer(answer)
 
