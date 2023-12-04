@@ -41,7 +41,6 @@ class Day4Solution(Aoc):
         return 13
 
     def TestDataB(self):
-        self.inputdata.clear()
         self.TestDataA()
         return 30
 
@@ -76,12 +75,8 @@ class Day4Solution(Aoc):
         for ix, card in enumerate(cards):
             same = set(card[2]).intersection(set(card[1]))
             if len(same) > 0:
-                count = counts[ix]
-                # print(f"Card {card[0]} => Same {len(same)} |  Adding {count}  cards {ix + 2} .. {ix + len(same) + 1} ")
                 for a in dirange(ix + 1, ix + len(same)):
-                    counts[a] += (count)
-                # print(counts)
-                # aa = input()
+                    counts[a] += counts[ix]
 
         answer = sum(counts)
 
