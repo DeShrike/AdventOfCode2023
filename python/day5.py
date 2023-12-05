@@ -12,10 +12,23 @@ class Mapping():
         self.name = name
         self.parts = []     # [(dst, src, len), ...]
 
+    def sortparts(self):
+        self.parts.sort(key=lambda x: x[1])
+
     def map(self, seed: int) -> int:
         for part in self.parts:
             dst = part[0]
             src = part[1]
+            l = part[2]
+            if src <= seed <= src + l - 1:
+                seed = (seed - src) + dst
+                break
+        return seed
+
+    def unmap(self, seed: int) -> int:
+        for part in self.parts:
+            dst = part[1]
+            src = part[0]
             l = part[2]
             if src <= seed <= src + l - 1:
                 seed = (seed - src) + dst
@@ -84,16 +97,8 @@ humidity-to-location map:
         return 35
 
     def TestDataB(self):
-        self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 46       # Should be 48 ???
 
     def ParseInput(self):
         mappings = []
@@ -111,14 +116,20 @@ humidity-to-location map:
                 parts = [int(p) for p in line.split(" ")]
                 mapping.parts.append((parts[0], parts[1], parts[2]))
 
+        for mapping in mappings:
+            mapping.sortparts()
+
         return seeds, mappings
 
     def Map(self, seed: int, mappings) -> int:
-        # print(f"Van {seed} ", end="")
         for mapping in mappings:
             seed = mapping.map(seed)
-            # print(f"{mapping.name} -> {seed}");
-        # print(f"naar {seed}")
+
+        return seed
+
+    def UnMap(self, seed: int, mappings) -> int:
+        for mapping in list(reversed(mappings)):
+            seed = mapping.unmap(seed)
 
         return seed
 
@@ -126,20 +137,42 @@ humidity-to-location map:
         self.StartPartA()
 
         seeds, mappings = self.ParseInput()
-        print(seeds)
         mapped = [self.Map(seed, mappings) for seed in seeds]
-        print(mapped)
-
         answer = min(mapped)
 
         self.ShowAnswer(answer)
 
+    def IsInSeedRange(self, seed: int, ranges) -> bool:
+        for range in ranges:
+            if range[0] <= seed <= range[0] + range[1] - 1:
+                return True
+        return False
+
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
+        seeds, mappings = self.ParseInput()
+        seedranges = [(seeds[ix], seeds[ix + 1]) for ix, r in enumerate(seeds) if ix % 2 == 0]
 
-        answer = None
+        # Make list of all seeds to try
+        totry = []
+        for m in mappings:
+            for p in m.parts:
+                totry.append(p[1])
+                totry.append(p[1] + p[2] - 1)
+                totry.append(self.UnMap(p[0], mappings))
+                totry.append(self.UnMap(p[0] + p[2] - 1, mappings))
+
+        # These are not needed:
+        # for r in seedranges:
+        #     totry.append(r[0])
+        #     totry.append(r[0] + r[1] - 1)
+
+        mapped = [self.Map(seed, mappings) for seed in totry if self.IsInSeedRange(seed, seedranges)]
+        answer = min(mapped)
+
+        # Attempt 1: 22565454 is too high
+        # Attempt 2: 10834440 is correct !
 
         self.ShowAnswer(answer)
 
