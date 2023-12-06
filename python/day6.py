@@ -1,7 +1,4 @@
 from aoc import Aoc
-import itertools
-import math
-import re
 import sys
 
 # Day 6
@@ -62,7 +59,6 @@ class Day6Solution(Aoc):
 
     def PartB(self):
         self.StartPartB()
-
 
         time = int(self.inputdata[0][10:].replace(" ", ""))
         dist = int(self.inputdata[1][10:].replace(" ", ""))

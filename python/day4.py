@@ -1,7 +1,5 @@
 from aoc import Aoc
 from utilities import dirange
-import itertools
-import math
 import sys
 
 # Day 4
