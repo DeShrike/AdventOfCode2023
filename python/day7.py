@@ -24,17 +24,23 @@ class Hand():
 
     def __init__(self, cards: str, part: str = "A"):
         self.cards = cards
+        self.originalcards = cards
         self.part = part
 
     def UpgradeJoker(self):
         if "J" not in self.cards:
             return
         
-        current, currentrank = self.cards, self.handtypeof(self.cards)
-
-
-        
-        pass
+        bestcard = None
+        current, bestrank = self.cards, self.handtypeof(self.cards)
+        for r in Hand.ranksB:
+            new = current.replace("J", r)
+            newrank = self.handtypeof(new)
+            if newrank < bestrank:
+                bestcard = r
+                bestrank = newrank
+        if bestcard:
+            self.cards = self.cards.replace("J", bestcard)
 
     def handtypeof(self, cards: str) -> HandType:
         o = list(sorted([cards.count(x) for x in set(cards)], reverse=True))
@@ -64,7 +70,7 @@ class Hand():
         t = self.handtype()
         o = other.handtype()
         if t == o:
-            for ct, co in zip(self.cards, other.cards):
+            for ct, co in zip(self.originalcards, other.originalcards):
                 if ct != co:
                     if self.part == "A":
                         return Hand.ranksA.index(ct) > Hand.ranksA.index(co)
@@ -131,7 +137,7 @@ class Day7Solution(Aoc):
 
         answer = 0
         hands = self.ParseInput()
-        self.SortHandsA(hands)
+        self.SortHands(hands)
         for ix, hand in enumerate(hands):
             answer += (ix + 1) * hand[1]        
 
@@ -142,9 +148,12 @@ class Day7Solution(Aoc):
 
         answer = 0
         hands = self.ParseInput("B")
-        self.SortHandsB(hands)
+        self.SortHands(hands)
         for ix, hand in enumerate(hands):
             answer += (ix + 1) * hand[1]        
+
+        # Attempt 1: 253720086 is too low
+        # Attempt 2: 254115617is correct
 
         self.ShowAnswer(answer)
 
