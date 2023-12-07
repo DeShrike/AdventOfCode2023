@@ -1,8 +1,5 @@
 from aoc import Aoc
 from enum import IntEnum
-import itertools
-import math
-import re
 import sys
 
 # Day 7
@@ -77,6 +74,7 @@ class Hand():
                     else:
                         return Hand.ranksB.index(ct) > Hand.ranksB.index(co)
         return t < o
+
 
 class Day7Solution(Aoc):
 
@@ -153,7 +151,7 @@ class Day7Solution(Aoc):
             answer += (ix + 1) * hand[1]        
 
         # Attempt 1: 253720086 is too low
-        # Attempt 2: 254115617is correct
+        # Attempt 2: 254115617 is correct
 
         self.ShowAnswer(answer)
 
