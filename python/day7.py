@@ -19,13 +19,25 @@ class HandType(IntEnum):
 
 
 class Hand():
-    ranks = list(reversed(["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]))
+    ranksA = list(reversed(["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]))
+    ranksB = list(reversed(["A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J"]))
 
-    def __init__(self, cards: str):
+    def __init__(self, cards: str, part: str = "A"):
         self.cards = cards
+        self.part = part
 
-    def handtype(self) -> HandType:
-        o = list(sorted([self.cards.count(x) for x in set(self.cards)], reverse=True))
+    def UpgradeJoker(self):
+        if "J" not in self.cards:
+            return
+        
+        current, currentrank = self.cards, self.handtypeof(self.cards)
+
+
+        
+        pass
+
+    def handtypeof(self, cards: str) -> HandType:
+        o = list(sorted([cards.count(x) for x in set(cards)], reverse=True))
         if len(o) == 5:
            return HandType.HighCard
         elif len(o) == 4:
@@ -42,14 +54,22 @@ class Hand():
             return HandType.TwoPair
     
         return None
-    
+
+    def handtype(self) -> HandType:
+        if self.part == "B":
+            self.UpgradeJoker()
+        return self.handtypeof(self.cards)
+        
     def __gt__(self, other):
         t = self.handtype()
         o = other.handtype()
         if t == o:
             for ct, co in zip(self.cards, other.cards):
                 if ct != co:
-                    return Hand.ranks.index(ct) > Hand.ranks.index(co)
+                    if self.part == "A":
+                        return Hand.ranksA.index(ct) > Hand.ranksA.index(co)
+                    else:
+                        return Hand.ranksB.index(ct) > Hand.ranksB.index(co)
         return t < o
 
 class Day7Solution(Aoc):
@@ -86,15 +106,8 @@ class Day7Solution(Aoc):
 
     def TestDataB(self):
         self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 5905
 
     def SortHands(self, hands):
         # Slow bubblesort
@@ -106,11 +119,11 @@ class Day7Solution(Aoc):
                     hands[ix], hands[ix + 1] = hands[ix + 1], hands[ix]
                     swapped = True
 
-    def ParseInput(self):
+    def ParseInput(self, part: str = "A"):
         cards = []  # [(hand, bid), ...]
         for line in self.inputdata:
             hand, bid = line.split(" ")
-            cards.append((Hand(hand), int(bid)))
+            cards.append((Hand(hand, part), int(bid)))
         return cards
 
     def PartA(self):
@@ -118,19 +131,20 @@ class Day7Solution(Aoc):
 
         answer = 0
         hands = self.ParseInput()
-        self.SortHands(hands)
+        self.SortHandsA(hands)
         for ix, hand in enumerate(hands):
             answer += (ix + 1) * hand[1]        
-
 
         self.ShowAnswer(answer)
 
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
-
-        answer = None
+        answer = 0
+        hands = self.ParseInput("B")
+        self.SortHandsB(hands)
+        for ix, hand in enumerate(hands):
+            answer += (ix + 1) * hand[1]        
 
         self.ShowAnswer(answer)
 
