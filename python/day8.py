@@ -1,8 +1,5 @@
 from aoc import Aoc
-from math import gcd
 from utilities import lcm
-import itertools
-import math
 import re
 import sys
 
