@@ -40,14 +40,14 @@ void start_part_a()
 {
 	printf("%sPart %sA%s\n", BrightWhite, BrightCyan, Reset);
 	part = 1;
-    start = clock();
+   start = clock();
 }
 
 void start_part_b()
 {
 	printf("%sPart %sB%s\n", BrightWhite, BrightCyan, Reset);
-	part = 2;
-    start = clock();
+   part = 2;
+   start = clock();
 }
 
 long long get_answer_a()
@@ -62,7 +62,7 @@ long long get_answer_b()
 
 void show_answer(long long answer)
 {
-    end = clock();
+   end = clock();
 
 	if (part == 1)
 	{
@@ -75,7 +75,7 @@ void show_answer(long long answer)
 		printf("Answer: %s%lld%s", BrightGreen, answer_b, Reset);
 	}
 
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 	printf(" | Took %s%f%s seconds\n\n", BrightMagenta, cpu_time_used, Reset);
 }
 
