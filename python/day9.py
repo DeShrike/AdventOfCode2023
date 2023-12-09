@@ -1,8 +1,5 @@
 from aoc import Aoc
 from utilities import dirange
-import itertools
-import math
-import re
 import sys
 
 # Day 9
@@ -39,16 +36,8 @@ class Day9Solution(Aoc):
         return 114
 
     def TestDataB(self):
-        self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 2
 
     def ParseInput(self):
         rows = []
@@ -73,6 +62,10 @@ class Day9Solution(Aoc):
         for ix in dirange(len(reduced) - 2, 0):
             reduced[ix].append(reduced[ix + 1][-1] + reduced[ix][-1])
 
+    def Prepolate(self, reduced):
+        reduced[-1].insert(0, 0)
+        for ix in dirange(len(reduced) - 2, 0):
+            reduced[ix].insert(0, reduced[ix][0] - reduced[ix + 1][0])
 
     def PartA(self):
         self.StartPartA()
@@ -80,24 +73,23 @@ class Day9Solution(Aoc):
         answer = 0
 
         rows = self.ParseInput()
-        # print(rows)
         for row in rows:
             reduced = self.Reduce(row)
-            #for r in reduced:
-            #    print(r)
-            #a = input()
             self.Extrapolate(reduced)
             answer += reduced[0][-1]
-
 
         self.ShowAnswer(answer)
 
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
+        answer = 0
 
-        answer = None
+        rows = self.ParseInput()
+        for row in rows:
+            reduced = self.Reduce(row)
+            self.Prepolate(reduced)
+            answer += reduced[0][0]
 
         self.ShowAnswer(answer)
 
