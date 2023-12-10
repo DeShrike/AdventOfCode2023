@@ -9,7 +9,7 @@ if ! [[ $DAY =~ $re ]] ; then
 fi
 
 if ((DAY < 1 || DAY > 25)); then
-    echo "Invalid day input: $1. Must be between 1 and 25." >&2; exit 1
+   echo "Invalid day input: $1. Must be between 1 and 25." >&2; exit 1
 fi
 
 if test -f "python/day${DAY}.py"; then
@@ -20,21 +20,21 @@ echo "Starting Day ${DAY} - ${YEAR}"
 
 # get session cookie from file if .session exists
 if [[ -f ".session" ]]; then
-  AOC_SESSION=$(<".session")
+   AOC_SESSION=$(<".session")
 fi
 
 # validate session cookie
 if [ -z "$AOC_SESSION" ]; then
-    echo "AOC_SESSION isn't set." >&2
-    echo "Take session cookie from browser and add it to file .session" >&2
-    SES = 0
+   echo "AOC_SESSION isn't set." >&2
+   echo "Take session cookie from browser and add it to file .session" >&2
+   SES = 0
 fi
 
 VALIDSESSION=$(curl -s "https://adventofcode.com/${YEAR}/day/${DAY}/input" --cookie "session=${AOC_SESSION}")
 if [[ $VALIDSESSION =~ "Puzzle inputs differ by user." ]] || [[ $VALIDSESSION =~ "500 Internal Server" ]]; then
-    echo "Invalid AOC_SESSION." >&2
-    echo "Inputfile will not be downloaded !" >&2
-    SES = 0
+   echo "Invalid AOC_SESSION." >&2
+   echo "Inputfile will not be downloaded !" >&2
+   SES = 0
 fi
 
 if ! [[ $SES == '0' ]]; then
