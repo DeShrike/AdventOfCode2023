@@ -1,19 +1,47 @@
 from aoc import Aoc
-from utilities import isingrid
-import itertools
-import math
-import re
+from utilities import isingrid, neighbours8
+from canvas import Canvas
 import sys
 
 # Day 10
 # https://adventofcode.com/2023
 
-
-connections = {
-    (1, 0): ("-", "J", "7"),
-    (-1, 0): ("-", "L", "F"),
-    (0, 1): ("|", "L", "J"),
-    (0, -1): ("|", "7", "F")
+bloks = {
+    "|": [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 0],
+    ],
+    "-": [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0],
+    ],
+    "F": [
+        [0, 0, 0],
+        [0, 1, 1],
+        [0, 1, 0],
+    ],
+    "L": [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+    ],
+    "7": [
+        [0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0],
+    ],
+    "J": [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 0, 0],
+    ],
+    ".": [
+        [0, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+    ]
 }
 
 connections = {
@@ -52,6 +80,8 @@ connections = {
 }
 
 dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+
+boxsize = 5
 
 class Day10Solution(Aoc):
 
@@ -96,15 +126,35 @@ class Day10Solution(Aoc):
 
     def TestDataB(self):
         self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
         testdata = \
         """
-        1000
-        2000
-        3000
+        .F----7F7F7F7F-7....
+        .|F--7||||||||FJ....
+        .||.FJ||||||||L7....
+        FJL7L7LJLJ||LJ.L-7..
+        L--J.L7...LJS7F-7L7.
+        ....F-J..F7FJ|L7L7L7
+        ....L7.F7||L7|.L7L7|
+        .....|FJLJ|FJ|F7|.LJ
+        ....FJL-7.||.||||...
+        ....L---J.LJ.LJLJ...
+        """
+
+        testdatax = \
+        """
+        FF7FSF7F7F7F7F7F---7
+        L|LJ||||||||||||F--J
+        FL-7LJLJ||||||LJL-77
+        F--JF--7||LJLJ7F7FJ-
+        L---JF-JLJ.||-FJLJJ7
+        |F|F-JF---7F7-L7L|7|
+        |FFJF7L7F-JF7|JL---7
+        7-L-JL7||F7|L7F-7F7|
+        L.L7LFJ|||||FJL7||LJ
+        L7JLJL-JLJLJL--JLJ.L
         """
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        return 8
 
     def ParseInput(self):
         w = len(self.inputdata[0])
@@ -151,15 +201,26 @@ class Day10Solution(Aoc):
         s = set(possibilities[0]).intersection(set(possibilities[1]))
         grid[pos[1]][pos[0]] = list(s)[0]
         return (w, h), pos, grid
-    
-    def PartA(self):
-        self.StartPartA()
 
-        answer = 0
-        size, startpos, grid = self.ParseInput()
+    def DrawBlok(self, canvas: Canvas, x: int, y: int, bloksize: int, symbol: str, color = (0, 0, 255)) -> None:
+        b = bloks[symbol]
+        xx = x * bloksize * 3
+        yy = y * bloksize * 3
+        for yyy, row in enumerate(b):
+            for xxx, c in enumerate(row):
+                if c == 1:
+                    canvas.set_big_pixel(xx + xxx * bloksize, yy + yyy * bloksize, color, bloksize)
+
+    def CalculatePath(self, size, startpos, grid, wx: int = 0, wy: int = 0):
         pos = list(startpos)
         dix = 0
         lastdix = None
+        path = []
+        lastx = pos[0]
+        winding = 0
+        canvas = None
+        if wx == 0:
+            canvas = Canvas(size[0] * boxsize * 3, size[1] * boxsize * 3)
         while True:
             while True:
                 xx = pos[0] + dirs[dix][0]
@@ -173,20 +234,95 @@ class Day10Solution(Aoc):
                         dix = (dix + 1) % 4
                         break
                 dix = (dix + 1) % 4
-            answer += 1
+            if canvas is not None:
+                self.DrawBlok(canvas, pos[0], pos[1], boxsize, grid[pos[1]][pos[0]])
+            path.append(pos)
+            
+            if lastx == wx and pos[1] > wy and pos[0] == wx + 1:
+                winding += 1
+            if lastx == wx and pos[1] > wy and pos[0] == wx - 1:
+                winding -= 1
+            if lastx == wx and pos[1] < wy and pos[0] == wx - 1:
+                winding += 1
+            if lastx == wx and pos[1] < wy and pos[0] == wx + 1:
+                winding -= 1
+            lastx = pos[0]
+
             if pos == startpos:
                 break
 
-        answer = answer // 2
+        return canvas, path, winding
+
+    def Inside(self, x:int, y: int, grid) -> bool:
+        h = len(grid)
+        w = len(grid[0])
+        c = 0
+        while x >= 0:
+            x -= 1
+            if grid[y][x] == 1:
+                c += 1
+        return c % 2 == 1
+
+    def Floodfill(self, grid):
+        h = len(grid)
+        w = len(grid[0])
+
+        q = [(0, 0)]
+        while len(q) > 0:
+            current = q.pop()
+            for n in neighbours8(current[0], current[1], (w, h)):
+                if grid[n[1]][n[0]] == 0:
+                    grid[n[1]][n[0]] = 2
+                    q.append(n)
+
+    def PartA(self):
+        self.StartPartA()
+
+        size, startpos, grid = self.ParseInput()
+        canvas, path, _ = self.CalculatePath(size, startpos, grid)
+
+        pngname = "day10a.png"
+        print(f"Saving {pngname}")
+        canvas.save_PNG(pngname)
+
+        answer = len(path) // 2
 
         self.ShowAnswer(answer)
 
     def PartB(self):
         self.StartPartB()
 
-        # Add solution here
+        size, startpos, grid = self.ParseInput()
+        canvas, path, _ = self.CalculatePath(size, startpos, grid)
 
-        answer = None
+        newgrid = [[0 for _ in range(size[0] + 2)] for _ in range(size[1] + 2)]
+        for pos in path:
+            newgrid[pos[1] + 1][pos[0] + 1] = 1
+
+        self.Floodfill(newgrid)
+
+        for y, row in enumerate(newgrid):
+            for x, c in enumerate(row):
+                if c == 0:
+                    _, _, w = self.CalculatePath(size, startpos, grid, x - 1, y - 1)
+                    if w != 0:
+                        newgrid[y][x] = 2
+
+        for y, row in enumerate(newgrid):
+            for x, c in enumerate(row):
+                if c == 0:
+                    self.DrawBlok(canvas, x - 1, y - 1, boxsize, ".", (0, 255, 0))
+                elif c == 2:
+                    self.DrawBlok(canvas, x - 1, y - 1, boxsize, ".", (255, 0, 0))
+
+        pngname = "day10b.png"
+        print(f"Saving {pngname}")
+        canvas.save_PNG(pngname)
+
+        # Attempt 1: 610 is too high
+        # Attempt 2: 
+
+        answer = sum([len([1 for x in row[1:-1] if x == 0]) for row in newgrid[1:-1]])
 
         self.ShowAnswer(answer)
 

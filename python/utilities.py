@@ -38,5 +38,5 @@ def dirange(start: int, end: int = None, step: int=1):
     else:
         yield from range(start, end - 1, -step)
 
-def isingrid(x: int, y: int, width: int, height: int) -> bool::
+def isingrid(x: int, y: int, width: int, height: int) -> bool:
     return x >= 0 and x < width and y >= 0 and y < height
