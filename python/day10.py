@@ -112,15 +112,6 @@ class Day10Solution(Aoc):
         |F--J
         LJ.LJ
         """
-
-        testdatax = \
-        """
-        -L|F7
-        7S-7|
-        L|7||
-        -L-J|
-        L|-JF
-        """
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
         return 8
 
@@ -138,20 +129,6 @@ class Day10Solution(Aoc):
         .....|FJLJ|FJ|F7|.LJ
         ....FJL-7.||.||||...
         ....L---J.LJ.LJLJ...
-        """
-
-        testdatax = \
-        """
-        FF7FSF7F7F7F7F7F---7
-        L|LJ||||||||||||F--J
-        FL-7LJLJ||||||LJL-77
-        F--JF--7||LJLJ7F7FJ-
-        L---JF-JLJ.||-FJLJJ7
-        |F|F-JF---7F7-L7L|7|
-        |FFJF7L7F-JF7|JL---7
-        7-L-JL7||F7|L7F-7F7|
-        L.L7LFJ|||||FJL7||LJ
-        L7JLJL-JLJLJL--JLJ.L
         """
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
         return 8
@@ -211,16 +188,12 @@ class Day10Solution(Aoc):
                 if c == 1:
                     canvas.set_big_pixel(xx + xxx * bloksize, yy + yyy * bloksize, color, bloksize)
 
-    def CalculatePath(self, size, startpos, grid, wx: int = 0, wy: int = 0):
+    def CalculatePath(self, size, startpos, grid):
         pos = list(startpos)
         dix = 0
         lastdix = None
         path = []
-        lastx = pos[0]
-        winding = 0
-        canvas = None
-        if wx == 0:
-            canvas = Canvas(size[0] * boxsize * 3, size[1] * boxsize * 3)
+        canvas = Canvas(size[0] * boxsize * 3, size[1] * boxsize * 3)
         while True:
             while True:
                 xx = pos[0] + dirs[dix][0]
@@ -234,34 +207,13 @@ class Day10Solution(Aoc):
                         dix = (dix + 1) % 4
                         break
                 dix = (dix + 1) % 4
-            if canvas is not None:
-                self.DrawBlok(canvas, pos[0], pos[1], boxsize, grid[pos[1]][pos[0]])
+            self.DrawBlok(canvas, pos[0], pos[1], boxsize, grid[pos[1]][pos[0]])
             path.append(pos)
             
-            if lastx == wx and pos[1] > wy and pos[0] == wx + 1:
-                winding += 1
-            if lastx == wx and pos[1] > wy and pos[0] == wx - 1:
-                winding -= 1
-            if lastx == wx and pos[1] < wy and pos[0] == wx - 1:
-                winding += 1
-            if lastx == wx and pos[1] < wy and pos[0] == wx + 1:
-                winding -= 1
-            lastx = pos[0]
-
             if pos == startpos:
                 break
 
-        return canvas, path, winding
-
-    def Inside(self, x:int, y: int, grid) -> bool:
-        h = len(grid)
-        w = len(grid[0])
-        c = 0
-        while x >= 0:
-            x -= 1
-            if grid[y][x] == 1:
-                c += 1
-        return c % 2 == 1
+        return canvas, path
 
     def Floodfill(self, grid):
         h = len(grid)
@@ -279,50 +231,59 @@ class Day10Solution(Aoc):
         self.StartPartA()
 
         size, startpos, grid = self.ParseInput()
-        canvas, path, _ = self.CalculatePath(size, startpos, grid)
+        canvas, path = self.CalculatePath(size, startpos, grid)
 
         pngname = "day10a.png"
         print(f"Saving {pngname}")
         canvas.save_PNG(pngname)
 
         answer = len(path) // 2
-
         self.ShowAnswer(answer)
 
     def PartB(self):
         self.StartPartB()
 
         size, startpos, grid = self.ParseInput()
-        canvas, path, _ = self.CalculatePath(size, startpos, grid)
+        canvas, path = self.CalculatePath(size, startpos, grid)
 
-        newgrid = [[0 for _ in range(size[0] + 2)] for _ in range(size[1] + 2)]
+        newgrid = [[0 for _ in range(size[0] * 3)] for _ in range(size[1] * 3)]
         for pos in path:
-            newgrid[pos[1] + 1][pos[0] + 1] = 1
+            x = pos[0]
+            y = pos[1]
+            c = grid[y][x]
+            b = bloks[c]
+            for yy, row in enumerate(b):
+                for xx, cc in enumerate(row):
+                    if cc == 1:
+                        newgrid[y * 3 + yy][x * 3 + xx] = 1
+
 
         self.Floodfill(newgrid)
 
-        for y, row in enumerate(newgrid):
-            for x, c in enumerate(row):
-                if c == 0:
-                    _, _, w = self.CalculatePath(size, startpos, grid, x - 1, y - 1)
-                    if w != 0:
-                        newgrid[y][x] = 2
+        for y in range(size[1]):
+            for x in range(size[0]):
+                xx = x * 3 + 1
+                yy = y * 3 + 1
+                if newgrid[yy][xx] == 2:
+                    grid[y][x] == 2
 
-        for y, row in enumerate(newgrid):
+        answer = 0
+        for y, row in enumerate(grid):
             for x, c in enumerate(row):
-                if c == 0:
-                    self.DrawBlok(canvas, x - 1, y - 1, boxsize, ".", (0, 255, 0))
-                elif c == 2:
-                    self.DrawBlok(canvas, x - 1, y - 1, boxsize, ".", (255, 0, 0))
+                xx = x * 3 + 1
+                yy = y * 3 + 1
+                if newgrid[yy][xx] == 0:
+                    answer += 1
+                    self.DrawBlok(canvas, x, y, boxsize, ".", (0, 255, 0))
+                elif newgrid[yy][xx] == 2:
+                    self.DrawBlok(canvas, x, y, boxsize, ".", (255, 0, 0))
 
         pngname = "day10b.png"
         print(f"Saving {pngname}")
         canvas.save_PNG(pngname)
 
         # Attempt 1: 610 is too high
-        # Attempt 2: 
-
-        answer = sum([len([1 for x in row[1:-1] if x == 0]) for row in newgrid[1:-1]])
+        # Attempt 2: 357 is correct
 
         self.ShowAnswer(answer)
 

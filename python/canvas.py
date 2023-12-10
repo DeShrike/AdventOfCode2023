@@ -121,6 +121,11 @@ class Canvas():
             return
         self.data[y][x] = color
 
+    def set_big_pixel(self, x:int, y:int, color, size: int):
+        for xx in range(size):
+            for yy in range(size):
+                self.set_pixel(x + xx, y + yy, color)
+
     def save_PNG(self, filename:str):
         png = self.make_RGB_PNG()
 

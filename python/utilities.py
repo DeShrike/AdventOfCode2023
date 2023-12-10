@@ -40,3 +40,13 @@ def dirange(start: int, end: int = None, step: int=1):
 
 def isingrid(x: int, y: int, width: int, height: int) -> bool:
     return x >= 0 and x < width and y >= 0 and y < height
+
+def neighbours8(x: int, y: int, size = None):
+    dirs = [(1, 0), (1, 1), (0, 1), (-1, 1),(-1, 0), (-1, -1), (0, -1), (1, -1)]
+    for dir in dirs:
+        xx = x + dir[0]
+        yy = y + dir[1]
+        if size != None and not isingrid(xx, yy, size[0], size[1]):
+            continue
+        yield (xx, yy)
+ 
