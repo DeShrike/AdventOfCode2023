@@ -45,7 +45,7 @@ bloks = {
 }
 
 connections = {
-    (1, 0):  { 
+    (1, 0): {
         "-": ["-", "J", "7"],
         "|": [],
         "7": [],
@@ -53,7 +53,7 @@ connections = {
         "F": ["-", "J", "7"],
         "L": ["-", "J", "7"],
     },
-    (-1, 0):  { 
+    (-1, 0): {
         "-": ["-", "L", "F"],
         "|": [],
         "7": ["-", "L", "F"],
@@ -61,7 +61,7 @@ connections = {
         "F": [],
         "L": [],
     },
-    (0, -1):  { 
+    (0, -1): {
         "-": [],
         "|": ["|", "F", "7"],
         "7": [],
@@ -69,7 +69,7 @@ connections = {
         "F": [],
         "L": ["|", "F", "7"],
     },
-    (0, 1):  { 
+    (0, 1): {
         "-": [],
         "|": ["|", "J", "L"],
         "7": ["|", "J", "L"],
@@ -209,7 +209,7 @@ class Day10Solution(Aoc):
                 dix = (dix + 1) % 4
             self.DrawBlok(canvas, pos[0], pos[1], boxsize, grid[pos[1]][pos[0]])
             path.append(pos)
-            
+
             if pos == startpos:
                 break
 
@@ -218,7 +218,6 @@ class Day10Solution(Aoc):
     def Floodfill(self, grid):
         h = len(grid)
         w = len(grid[0])
-
         q = [(0, 0)]
         while len(q) > 0:
             current = q.pop()
@@ -256,7 +255,6 @@ class Day10Solution(Aoc):
                 for xx, cc in enumerate(row):
                     if cc == 1:
                         newgrid[y * 3 + yy][x * 3 + xx] = 1
-
 
         self.Floodfill(newgrid)
 
