@@ -232,6 +232,11 @@ class Day10Solution(Aoc):
         size, startpos, grid = self.ParseInput()
         canvas, path = self.CalculatePath(size, startpos, grid)
 
+        for y in range(size[1]):
+            for x in range(size[0]):
+                if (x, y) not in path:
+                    self.DrawBlok(canvas, x, y, boxsize, grid[y][x], (50, 50, 50))
+
         pngname = "day10a.png"
         print(f"Saving {pngname}")
         canvas.save_PNG(pngname)
