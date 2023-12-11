@@ -70,7 +70,7 @@ class Day11Solution(Aoc):
                 c = c + 1
                 for row in hgrid:
                     row.insert(x, ".")
-        print(f"Extra rows: {r}  Extra columns: {c}")
+        # print(f"Extra rows: {r}  Extra columns: {c}")
         return hgrid
 
     def FindEmpty(self, grid):
@@ -116,22 +116,14 @@ class Day11Solution(Aoc):
         universe = self.ParseInput()
         erows, ecols = self.FindEmpty(universe)
         galaxies = self.FindGalaxies(universe)
-        print(ecols)
-        print(erows)
-        # print(galaxies)
+        # print(ecols)
+        # print(erows)
 
         answer = 0
         for c in itertools.combinations(galaxies, 2):
             dist = manhattan_distance(c[0], c[1])
             er = len([v for v in erows if self.isbetween(v, c[0][1], c[1][1])])
             ec = len([v for v in ecols if self.isbetween(v, c[0][0], c[1][0])])
-
-            # print(ecols)
-            # print(erows)
-            # print(f" X: {c[0][0]} -> {c[1][0]}    Y: {c[0][1]} -> {c[1][1]} ")
-            # print("ec", ec)
-            # print("er", er)
-            # a = input()
             answer += dist + er * (self.expand_by - 1) + ec * (self.expand_by - 1)
 
         self.ShowAnswer(answer)
