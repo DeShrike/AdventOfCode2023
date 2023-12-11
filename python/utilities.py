@@ -50,3 +50,5 @@ def neighbours8(x: int, y: int, size = None):
             continue
         yield (xx, yy)
  
+def manhattan_distance(a, b) -> int:
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
