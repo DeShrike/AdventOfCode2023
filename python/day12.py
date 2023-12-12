@@ -1,8 +1,8 @@
 from aoc import Aoc
 from collections import Counter
+import re
 import itertools
 import math
-import re
 import sys
 
 # Day 12
@@ -19,9 +19,9 @@ class Day12Solution(Aoc):
     def Test(self):
         self.StartDay(12)
 
-        goal = self.TestDataA()
-        self.PartA()
-        self.Assert(self.GetAnswerA(), goal)
+        # goal = self.TestDataA()
+        # self.PartA()
+        # self.Assert(self.GetAnswerA(), goal)
 
         goal = self.TestDataB()
         self.PartB()
@@ -46,10 +46,6 @@ class Day12Solution(Aoc):
         return 525152
 
     def ParseInput(self):
-        # rx = re.compile("^(?P<from>[A-Z0-9]{3}) = \((?P<left>[A-Z0-9]{3}), (?P<right>[A-Z0-9]{3})\)$")
-        # match = rx.search(line)
-        # pos = match["from"]
-
         data = []
         for line in self.inputdata:
             parts = line.split(" ")
@@ -59,8 +55,10 @@ class Day12Solution(Aoc):
 
     def CheckValid(self, v: str, nums: list[int]) -> bool:
         v2 = v.replace("..", ".")
-        for _ in range(4):
-            v2 = v2.replace("..", ".")
+        v2 = v2.replace("..", ".")
+        v2 = v2.replace("..", ".")
+        v2 = v2.replace("..", ".")
+        v2 = v2.replace("..", ".")
         cc = [len(v4) for v4 in v2.strip(".").split(".")]
         return cc == nums
     
@@ -82,12 +80,36 @@ class Day12Solution(Aoc):
         news = data[0] + "?" + data[0] + "?" + data[0] + "?" + data[0] + "?" + data[0]
         newnumbers = data[1] * 5
         return news, newnumbers
+
+    def CountPosibilities(self, s: str, num:int) -> int:
+        c = 0
+        bits = Counter(s)["?"]
+        print(f"{s} -> {bits} bit   ", end="")
+        for i in range(2 ** bits):
+            news = self.SetBits(i, s)
+            if self.CheckValid(news, [num]):
+                c += 1
+        print(f" --> {c}")
+        return c
     
     def SolveExpanded(self, record: str, nums: list[int]) -> int:
+        r = "^[\.\?]*"
+        for n in nums:
+            r += "([\?#]{" + str(n) + "," + str(n + 20) + "}?)"
+            r += "[\.\?]*"
+        r += "$"
+        print(r)
+        rx = re.compile(r)
+        match = rx.search(record)
+        g = match.groups(0)
+        print(g)
 
-
-
-        return 0
+        t = 1
+        for s, n in zip(g, nums):
+            t *= self.CountPosibilities(s, n)
+        print("T: ", t)
+        a = input()
+        return t
 
     def PartA(self):
         self.StartPartA()
@@ -112,7 +134,7 @@ class Day12Solution(Aoc):
         answer = 0
         for d in data:
             record, nums = self.Expand(d)
-            # print(record, nums)
+            print(record, nums)
             answer += self.SolveExpanded(record, nums)
 
         self.ShowAnswer(answer)
