@@ -68,11 +68,20 @@ class Day13Solution(Aoc):
 
         return data
 
-    def TryReflect(self, pattern) -> int:
+    def CountDiff(self, line1: list[str], line2: list[str]) -> int:
+        return len([0 for c1, c2 in zip(line1, line2) if c1 != c2])
+
+    def TryReflect(self, pattern, fixdiff: bool = False) -> int:
         h = len(pattern)
         w = len(pattern[0])
 
         for ix in range(h - 1):
+            if fixdiff:
+                if pattern[ix] != pattern[ix + 1]:
+                    if self.CountDiff(pattern[ix], pattern[ix + 1]) == 1:
+                        print(pattern[ix], pattern[ix + 1])
+                        pattern[ix] = pattern[ix + 1][:]
+                        print("fixed")
             if pattern[ix] == pattern[ix + 1]:
                 rix = ix
                 bad = False
@@ -81,18 +90,24 @@ class Day13Solution(Aoc):
                     if l < 0 or rix >= h:
                         break
                     if pattern[l] != pattern[rix]:
-                        bad = True
-                        break
+                        if fixdiff:
+                            if self.CountDiff(pattern[l], pattern[rix]) == 1:
+                                print(pattern[l], pattern[rix])
+                                pattern[l] = pattern[rix][:]
+                                print("fixed")
+                        else:
+                            bad = True
+                            break
                 if not bad:
                     return ix + 1
 
         return None
 
-    def Reflect(self, pattern) -> int:
-        result = self.TryReflect(pattern)
+    def Reflect(self, pattern, fixdiff: bool = False) -> int:
+        result = self.TryReflect(pattern, fixdiff)
         if result is None:
             pattern_t = [list(x) for x in zip(*pattern)]
-            result = self.TryReflect(pattern_t)
+            result = self.TryReflect(pattern_t, fixdiff)
         else:
             result *= 100
         return result
@@ -113,8 +128,11 @@ class Day13Solution(Aoc):
         answer = 0
         data = self.ParseInput()
         for pattern in data:
-            answer += self.Reflect(pattern)
-        
+            answer += self.Reflect(pattern, True)
+            # a = input()
+
+        # Attempt 1: 39597 is too high
+
         self.ShowAnswer(answer)
 
 

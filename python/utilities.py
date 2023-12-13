@@ -1,6 +1,5 @@
 from math import gcd
 from typing import Iterator
-import fcntl, struct, termios
 
 def modify_bit(self, number: int, bit: int, value: int) -> int:
     m = 1 << bit
@@ -13,6 +12,7 @@ def lcm(a: int, b: int) -> int:
     return abs(a * b) // gcd(a, b)
 
 def terminal_size() -> tuple[int, int]:
+    import fcntl, struct, termios
     return struct.unpack('HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)))[:2]
 
 def sumrange(c: int) -> int:
