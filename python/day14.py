@@ -135,29 +135,51 @@ class Day14Solution(Aoc):
         for y in range(rows):
             self.SlideRight(data, y)
 
+    def Cycle(self, list):
+        shortest = [] 
+        if len(list) <= 1: 
+            return list
+        if len(set(list)) == len(list): 
+            return list
+        for x in range(len(list)):
+            if list[0:x] == list[x:2 * x]:
+                shortest = list[0:x]
+        return shortest 
+
     def PartB(self):
         self.StartPartB()
 
         data = self.ParseInput()
-
-        # I found those numbers (107 and 34) the manual way
-
+        prefix = 0
+        cycle = 1
         count = 1_000_000_000
 
-        for i in range(107):
+        loads = []
+        for i in range(1000):
             self.DoCycle(data)
-            # load = self.CalcLoad(data)
-            # print(f"Cycle\t{i + 1}\t{load}")
+            load = self.CalcLoad(data)
+            loads.append(load)
 
-        i = 107
-        while i + 34 < count:
-            i += 34
+        for i in range(1000):
+            s = self.Cycle(loads[i:])
+            if len(s) > 0:
+                print(f"Prefix: {i}  cycle: {len(s)}")
+                prefix = i
+                cycle = len(s)
+                break
+
+        data = self.ParseInput()    # reset
+
+        for i in range(prefix):
+            self.DoCycle(data)
+
+        # This part can be improved ;)
+        i = prefix
+        while i + cycle < count:
+            i += cycle
 
         while i < count:
             self.DoCycle(data)
-
-            # load = self.CalcLoad(data)
-            # print(f"Cycle\t{i + 1}\t{load}")
             i += 1
 
         # Attempt 1: 90575 is too high
