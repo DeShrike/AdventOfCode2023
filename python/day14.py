@@ -1,4 +1,5 @@
 from aoc import Aoc
+from utilities import dirange
 import itertools
 import math
 import re
@@ -55,7 +56,7 @@ class Day14Solution(Aoc):
 
         return data
 
-    def SlideUpAndCalcLoad(self, grid, x: int) -> int:
+    def SlideUp(self, grid, x: int) -> None:
         h = len(grid)
         moved = True
         while moved:
@@ -64,10 +65,45 @@ class Day14Solution(Aoc):
                 if grid[y][x] == "O" and grid[y - 1][x] == ".":
                     moved = True
                     grid[y][x], grid[y - 1][x] = grid[y - 1][x], grid[y][x]
+
+    def SlideLeft(self, grid, y: int) -> None:
+        w = len(grid[0])
+        moved = True
+        while moved:
+            moved = False
+            for x in range(1, w):
+                if grid[y][x] == "O" and grid[y][x - 1] == ".":
+                    moved = True
+                    grid[y][x], grid[y][x - 1] = grid[y][x - 1], grid[y][x]
+
+    def SlideDown(self, grid, x: int) -> None:
+        h = len(grid)
+        moved = True
+        while moved:
+            moved = False
+            for y in dirange(h - 2, 0):
+                if grid[y][x] == "O" and grid[y + 1][x] == ".":
+                    moved = True
+                    grid[y][x], grid[y + 1][x] = grid[y + 1][x], grid[y][x]
+
+    def SlideRight(self, grid, y: int) -> None:
+        w = len(grid[0])
+        moved = True
+        while moved:
+            moved = False
+            for x in dirange(w - 2, 0):
+                if grid[y][x] == "O" and grid[y][x + 1] == ".":
+                    moved = True
+                    grid[y][x], grid[y][x + 1] = grid[y][x + 1], grid[y][x]
+
+    def CalcLoad(self, grid) -> int:
+        h = len(grid)
+        w = len(grid[0])
         load = 0
-        for y in range(0, h):
-            if grid[y][x] == "O":
-                load += (h - y)
+        for x in range(w):
+            for y in range(0, h):
+                if grid[y][x] == "O":
+                    load += (h - y)
 
         return load
 
@@ -76,24 +112,58 @@ class Day14Solution(Aoc):
 
         data = self.ParseInput()
 
-        answer = 0
         cols = len(data[0])
         for x in range(cols):
-            answer += self.SlideUpAndCalcLoad(data, x)
-        for r in data:
-            print(r)
+            self.SlideUp(data, x)
 
-        # Add solution here
+        answer = self.CalcLoad(data)
 
         self.ShowAnswer(answer)
+
+    def DoCycle(self, data) -> None:
+        cols = len(data[0])
+        rows = len(data)
+        for x in range(cols):
+            self.SlideUp(data, x)
+
+        for y in range(rows):
+            self.SlideLeft(data, y)
+
+        for x in range(cols):
+            self.SlideDown(data, x)
+
+        for y in range(rows):
+            self.SlideRight(data, y)
 
     def PartB(self):
         self.StartPartB()
 
-        # data = self.ParseInput()
-        answer = None
+        data = self.ParseInput()
 
-        # Add solution here
+        # I found those numbers (107 and 34) the manual way
+
+        count = 1_000_000_000
+
+        for i in range(107):
+            self.DoCycle(data)
+            # load = self.CalcLoad(data)
+            # print(f"Cycle\t{i + 1}\t{load}")
+
+        i = 107
+        while i + 34 < count:
+            i += 34
+
+        while i < count:
+            self.DoCycle(data)
+
+            # load = self.CalcLoad(data)
+            # print(f"Cycle\t{i + 1}\t{load}")
+            i += 1
+
+        # Attempt 1: 90575 is too high
+        # Attempt 2: 90551 is correct
+
+        answer = self.CalcLoad(data)
 
         self.ShowAnswer(answer)
 
