@@ -71,17 +71,10 @@ class Day13Solution(Aoc):
     def CountDiff(self, line1: list[str], line2: list[str]) -> int:
         return len([0 for c1, c2 in zip(line1, line2) if c1 != c2])
 
-    def TryReflect(self, pattern, fixdiff: bool = False) -> int:
+    def TryReflect(self, pattern) -> int:
         h = len(pattern)
         w = len(pattern[0])
-
         for ix in range(h - 1):
-            if fixdiff:
-                if pattern[ix] != pattern[ix + 1]:
-                    if self.CountDiff(pattern[ix], pattern[ix + 1]) == 1:
-                        print(pattern[ix], pattern[ix + 1])
-                        pattern[ix] = pattern[ix + 1][:]
-                        print("fixed")
             if pattern[ix] == pattern[ix + 1]:
                 rix = ix
                 bad = False
@@ -90,27 +83,57 @@ class Day13Solution(Aoc):
                     if l < 0 or rix >= h:
                         break
                     if pattern[l] != pattern[rix]:
-                        if fixdiff:
-                            if self.CountDiff(pattern[l], pattern[rix]) == 1:
-                                print(pattern[l], pattern[rix])
-                                pattern[l] = pattern[rix][:]
-                                print("fixed")
-                        else:
-                            bad = True
-                            break
+                        bad = True
+                        break
                 if not bad:
                     return ix + 1
 
         return None
 
-    def Reflect(self, pattern, fixdiff: bool = False) -> int:
-        result = self.TryReflect(pattern, fixdiff)
+    def TryFixAndReflect(self, pattern) -> list[int]:
+        h = len(pattern)
+        w = len(pattern[0])
+        results = []
+
+        for ix in range(h - 1):
+            if pattern[ix] != pattern[ix + 1]:
+                if self.CountDiff(pattern[ix], pattern[ix + 1]) == 1:
+                    pattern[ix] = pattern[ix + 1][:]
+            if pattern[ix] == pattern[ix + 1]:
+                rix = ix
+                bad = False
+                for l in dirange(ix, 0):
+                    rix += 1
+                    if l < 0 or rix >= h:
+                        break
+                    if pattern[l] != pattern[rix]:
+                        if self.CountDiff(pattern[l], pattern[rix]) == 1:
+                            pattern[l] = pattern[rix][:]
+                    if pattern[l] != pattern[rix]:
+                        bad = True
+                        break
+                if not bad:
+                    results.append(ix + 1)
+
+        return results
+
+    def Reflect(self, pattern) -> int:
+        result = self.TryReflect(pattern)
         if result is None:
             pattern_t = [list(x) for x in zip(*pattern)]
-            result = self.TryReflect(pattern_t, fixdiff)
+            result = self.TryReflect(pattern_t)
         else:
             result *= 100
         return result
+
+    def FindAllReflections(self, pattern) -> int:
+        reflections = []
+        result = self.TryFixAndReflect(pattern)
+        reflections += [r * 100 for r in result]
+        pattern_t = [list(x) for x in zip(*pattern)]
+        result = self.TryFixAndReflect(pattern_t)
+        reflections += result
+        return reflections
 
     def PartA(self):
         self.StartPartA()
@@ -128,11 +151,15 @@ class Day13Solution(Aoc):
         answer = 0
         data = self.ParseInput()
         for pattern in data:
-            answer += self.Reflect(pattern, True)
-            # a = input()
+            normal = self.Reflect(pattern)
+            reflections = self.FindAllReflections(pattern)
+            reflections.remove(normal)
+            # print(normal, reflections)
+            answer += reflections[0]
 
         # Attempt 1: 39597 is too high
-
+        # Attempt 2: 36755 is correct
+        
         self.ShowAnswer(answer)
 
 

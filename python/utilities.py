@@ -72,7 +72,7 @@ def neighbours4(x: int, y: int, size: tuple[int, int] = None) -> Iterator[tuple[
             continue
         yield (xx, yy)
 
-def manhattan_distance(a: tuple[int, int], b) -> int:
+def manhattan_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
     """
     Calculate the Manhattan distance between 2 points.
     """
