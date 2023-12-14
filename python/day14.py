@@ -1,8 +1,5 @@
 from aoc import Aoc
 from utilities import dirange
-import itertools
-import math
-import re
 import sys
 
 # Day 14
@@ -23,9 +20,9 @@ class Day14Solution(Aoc):
         self.PartA()
         self.Assert(self.GetAnswerA(), goal)
 
-        goal = self.TestDataB()
-        self.PartB()
-        self.Assert(self.GetAnswerB(), goal)
+        # goal = self.TestDataB()
+        # self.PartB()
+        # self.Assert(self.GetAnswerB(), goal)
 
     def TestDataA(self):
         self.inputdata.clear()

@@ -93,21 +93,26 @@ class Day12Solution(Aoc):
         return c
     
     def SolveExpanded(self, record: str, nums: list[int]) -> int:
-        r = "^[\.\?]*"
-        for n in nums:
-            r += "([\?#]{" + str(n) + "," + str(n + 20) + "}?)"
-            r += "[\.\?]*"
+        r = "^[\.\?]*?"
+        for ix, n in enumerate(nums):
+            r += "([\?#]{" + str(n) + "}?)"
+            # r += "([\?#]{" + str(n) + "," + str(n + 20) + "}?)"
+            if ix < len(nums) - 1:
+                r += "[\.\?]+?"
+            else:
+                r += "[\.\?]*?"
         r += "$"
         print(r)
         rx = re.compile(r)
         match = rx.search(record)
-        g = match.groups(0)
-        print(g)
+
+        for groupNum in range(1, len(match.groups()) + 1):
+            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
 
         t = 1
-        for s, n in zip(g, nums):
-            t *= self.CountPosibilities(s, n)
-        print("T: ", t)
+        # for s, n in zip(g, nums):
+        #     t *= self.CountPosibilities(s, n)
+        # print("T: ", t)
         a = input()
         return t
 
