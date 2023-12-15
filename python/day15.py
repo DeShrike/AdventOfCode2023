@@ -1,7 +1,4 @@
 from aoc import Aoc
-import itertools
-import math
-import re
 import sys
 
 # Day 15
@@ -36,16 +33,8 @@ class Day15Solution(Aoc):
         return 1320
 
     def TestDataB(self):
-        self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 145
 
     def ParseInput(self):
         data = self.inputdata[0].split(",")
@@ -71,9 +60,39 @@ class Day15Solution(Aoc):
         self.StartPartB()
 
         data = self.ParseInput()
-        answer = None
+        boxes = [[] for _ in range(256)]
+        for step in data:
+            if step[-1] == "-":
+                label = step[:-1]
+                hash = self.Hash(label)
+                for b in boxes[hash]:
+                    if b[1] == label:
+                        boxes[hash].remove(b)
+                        break
+            else:
+                label, strength = step.split("=")
+                hash = self.Hash(label)
+                found = False
+                for lix, l in enumerate(boxes[hash]):
+                    if l[1] == label:
+                        boxes[hash][lix] = (step, label, strength)
+                        found = True
+                        break
+                if not found:
+                    boxes[hash].append((step, label, strength))
 
-        # Add solution here
+            # for bix, b in enumerate(boxes):
+            #     if len(b) > 0:
+            #         print(f"Box {bix}: ", end="")
+            #         for l in b:
+            #             print(f"[{l[1]} {l[2]}]", end=" ")
+            #         print("")
+            # a = input()
+
+        answer = 0
+        for bix, box in enumerate(boxes):
+            for lix, l in enumerate(box):
+                answer += ((bix + 1) * (lix + 1)) * int(l[2])
 
         self.ShowAnswer(answer)
 
