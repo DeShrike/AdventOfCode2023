@@ -7,8 +7,11 @@ import sys
 # Day 18
 # https://adventofcode.com/2023
 
+
 class Dig():
+    dirs = { "R": (1, 0), "L": (-1, 0), "U": (0, -1), "D": (0, 1) }
     def __init__(self, line: str) -> None:
+        newdirs = ["R", "D", "L", "U"]
         rx = re.compile("^(?P<dir>[RDLU]) (?P<dist>[0-9]*) \(#(?P<r>[a-f0-9]{2})(?P<g>[a-f0-9]{2})(?P<b>[a-f0-9]{2})\)$")
         match = rx.search(line)
         if match:
@@ -17,16 +20,25 @@ class Dig():
             self.r = int("0x" + match["r"], 16)
             self.g = int("0x" + match["g"], 16)
             self.b = int("0x" + match["b"], 16)
+
+            b = match["r"] + match["g"] + match["b"]
+            self.newdist = int("0x"+b[:-1], 16)
+            self.newdir = newdirs[int(b[-1])]
         else:
             raise Exception("Parse Failed: " + line)
 
     def __str__(self) -> str:
-        return f"{self.dir} {self.dist} {self.r} {self.g} {self.b}"
+        return f"{self.dir} {self.dist} {self.r} {self.g} {self.b} | {self.newdir} {self.newdist}"
+
+    def EndPoint(self, x: int, y: int) -> tuple[int, int]:
+        dx = Dig.dirs[self.newdir][0]
+        dy = Dig.dirs[self.newdir][1]
+        return (x + (dx * self.newdist), y + (dy * self.newdist))
 
     def GetPositions(self, pos):
-        dirs = { "R": (1, 0), "L": (-1, 0), "U": (0, -1), "D": (0, 1) }
         for i in range(self.dist):
-            yield (pos[0] + (i + 1) * dirs[self.dir][0], pos[1] + (i + 1) * dirs[self.dir][1])
+            yield (pos[0] + (i + 1) * Dig.dirs[self.dir][0], pos[1] + (i + 1) * Dig.dirs[self.dir][1])
+
 
 class Day18Solution(Aoc):
 
@@ -70,22 +82,10 @@ class Day18Solution(Aoc):
         return 62
 
     def TestDataB(self):
-        self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 952408144115
 
     def ParseInput(self):
-        # rx = re.compile("^(?P<from>[A-Z0-9]{3}) = \((?P<left>[A-Z0-9]{3}), (?P<right>[A-Z0-9]{3})\)$")
-        # match = rx.search(line)
-        # pos = match["from"]
-
         data = []
         for line in self.inputdata:
             data.append(Dig(line))
@@ -141,8 +141,6 @@ class Day18Solution(Aoc):
 
         digs = self.ParseInput()
 
-        answer = None
-
         w, h, ox, oy = self.FindExtent(digs)
         grid = [[None for x in range(w)] for y in range(h)]
 
@@ -156,21 +154,37 @@ class Day18Solution(Aoc):
 
         self.Floodfill(grid)
 
-        answer = sum([len([True for c in row if c != (0, 0, 0)]) for row in grid])
-
         self.CreatePng(grid, "day18a.png")
 
-        # Add solution here
+        answer = sum([len([True for c in row if c != (0, 0, 0)]) for row in grid])
 
         self.ShowAnswer(answer)
 
     def PartB(self):
         self.StartPartB()
 
-        #data = self.ParseInput()
-        answer = None
+        digs = self.ParseInput()
+        vertices = []
+        current = (0, 0)
+        for dig in digs:
+            current = dig.EndPoint(*current)
+            vertices.append(current)
 
-        # Add solution here
+        a = 0
+        b = 0
+        for ix in range(len(vertices)):
+            o = ix + 1
+            if o >= len(vertices):
+                o = 0
+            a += vertices[ix][0] * vertices[o][1]
+            b += vertices[ix][1] * vertices[o][0]
+
+        c = sum([dig.newdist for dig in digs])
+
+        answer = (a - b) // 2 + (c // 2) + 1
+
+        # Attempt 1: 45_757_816_837_456 is too low
+        # Attempt 2: 45_757_884_535_661 is correct
 
         self.ShowAnswer(answer)
 
