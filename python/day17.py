@@ -2,6 +2,7 @@ from queue import PriorityQueue
 from aoc import Aoc
 from canvas import Canvas
 from utilities import neighbours4
+from dijkstra import DoDijkstra
 import heapq
 import itertools
 import math
@@ -107,7 +108,7 @@ class Day17Solution(Aoc):
     def heuristicX(self, a, b) -> int:
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-    def heuristic(self, p1, p2):
+    def heuristic(self, p1, p2) -> int:
         """
         Takes two points and returns the euclidian distance
         """
@@ -320,8 +321,9 @@ class Day17Solution(Aoc):
         w = len(data[0])
         h = len(data)
         # path = self.FindPath(data, (0, 0), (w - 1, h - 1))
-        path = self.astarXXX(data, (0, 0), (w - 1, h - 1))
-        # path = self.astar(data, (w - 1, h - 1), (0,0))
+        # path = self.astarXX(data, (0, 0), (w - 1, h - 1))
+        path = self.astarXXX(data, (w - 1, h - 1), (0,0))
+        # path = DoDijkstra(data)
         self.CreatePng(data, path, "day17a.png")
         answer = 0
         for x, y in path[1:]:
