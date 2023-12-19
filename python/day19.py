@@ -7,6 +7,7 @@ import sys
 # Day 19
 # https://adventofcode.com/2023
 
+
 class Workflow():
     def __init__(self, line: str) -> None:
         rx = re.compile("^(?P<name>[a-z]*){(?P<rules>.*)}$")
@@ -72,6 +73,18 @@ class Part():
         return f"x={self.x},m={self.m},a={self.a},s={self.s}  {status}"
 
 
+class Node():
+    def __init__(self, wf: Workflow) -> None:
+        self.rx = (0, 4000)
+        self.rm = (0, 4000)
+        self.ra = (0, 4000)
+        self.rs = (0, 4000)
+        self.parent = None
+        self.children = []
+        self.name = wf.name
+        self.wf = wf
+
+
 class Day19Solution(Aoc):
 
     def Run(self):
@@ -117,16 +130,8 @@ class Day19Solution(Aoc):
         return 19114
 
     def TestDataB(self):
-        self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
-        testdata = \
-        """
-        1000
-        2000
-        3000
-        """
-        self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
-        return None
+        self.TestDataA()
+        return 167409079868000
 
     def ParseInput(self):
         workflows = {}
@@ -184,11 +189,18 @@ class Day19Solution(Aoc):
 
         self.ShowAnswer(answer)
 
+    def AddChildren(self, node: Node, workflows: dict[Workflow]) -> None:
+        pass
+    
     def PartB(self):
         self.StartPartB()
 
-        # data = self.ParseInput()
+        workflows, _ = self.ParseInput()
         answer = None
+
+        wf = workflows["in"]
+        tree = Node(wf)
+        self.AddChildren(tree, workflows)
 
         # Add solution here
 
