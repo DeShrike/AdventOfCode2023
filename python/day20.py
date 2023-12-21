@@ -15,6 +15,7 @@ class Module():
         self.conjunction = typ == "&"
         self.state = False
         self.srcs = {}
+        self.gotlowpulse = False
 
     def __str__(self) -> str:
         return f"{self.typ} {self.name}"
@@ -23,13 +24,13 @@ class Module():
         self.srcs[src] = False
 
     def pulse(self, src: str, val: int):
+        if val == 0:
+            self.gotlowpulse = True
         if self.flipflop:
             if val == 0:
                 self.state = not self.state
                 return int(self.state)
         elif self.conjunction:
-            if src not in self.srcs:
-                self.srcs[src] = False
             self.srcs[src] = val
             # print(f"{self.name} states: {self.srcs}")
             if all([v for k, v in self.srcs.items()]):
@@ -67,10 +68,6 @@ class Day20Solution(Aoc):
         self.PartA()
         self.Assert(self.GetAnswerA(), goal)
 
-        goal = self.TestDataB()
-        self.PartB()
-        self.Assert(self.GetAnswerB(), goal)
-
     def TestDataA(self):
         self.inputdata.clear()
         testdata = \
@@ -81,25 +78,13 @@ class Day20Solution(Aoc):
         %b -> con
         &con -> output
         """
-        testdata = \
-        """
-        broadcaster -> a, b, c
-        %a -> b
-        %b -> c
-        %c -> inv
-        &inv -> a
-        """
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
         return 11687500
 
     def TestDataB(self):
         self.inputdata.clear()
-        # self.TestDataA()    # If test data is same as test data for part A
         testdata = \
         """
-        1000
-        2000
-        3000
         """
         self.inputdata = [line.strip() for line in testdata.strip().split("\n")]
         return None
@@ -145,38 +130,18 @@ class Day20Solution(Aoc):
 
         return configs, modules
 
-    def PushRec(self, src: str, name: str, val: int) -> None:
-        if val == 0:
-            self.lows += 1
-        else:
-            self.highs += 1
-
-        config = self.configs[src]
-
-        pp = []
-        for dst in config.destinations:
-            pulse = self.modules[dst].pulse(src, val)
-            pp.append((dst, dst, pulse))
-
-        for a, b, c in pp:
-            self.Push(a, b, c)
-
     def Push(self) -> None:
-
+        self.Q = [("button", 0)]
         while len(self.Q) > 0:
             src, val = self.Q.pop(0)
-
             config = self.configs[src]
-
             for dst in config.destinations:
-
                 if val == 0:
                     self.lows += 1
                 else:
                     self.highs += 1
 
                 # print(f"{src}  {'-high-' if val == 1 else '-low-'} -> {dst}")
-
                 pulse = self.modules[dst].pulse(src, val)
                 if pulse is not None:
                     self.Q.append((dst, pulse))
@@ -188,7 +153,6 @@ class Day20Solution(Aoc):
         self.highs = 0
         self.lows = 0
         for _ in range(1000):
-            self.Q = [("button", 0)]
             self.Push()
 
         answer = self.highs * self.lows
@@ -198,10 +162,25 @@ class Day20Solution(Aoc):
     def PartB(self):
         self.StartPartB()
 
-        data = self.ParseInput()
-        answer = None
+        self.configs, self.modules = self.ParseInput()
 
-        # Add solution here
+        flipflops = [mod for k, mod in self.modules.items() if mod.flipflop]
+        flipflops.sort(key=lambda f: f.name)
+
+        rx = self.modules["rx"]
+        answer = 0
+        while True:
+            answer += 1
+            if answer % 10_000 == 0:
+                print(answer)
+            self.Push()
+
+            # for f  in flipflops:
+            #     print("1" if f.state else "0", end="")
+            # print("\r", end="", flush=True)
+
+            if rx.gotlowpulse:
+                break
 
         self.ShowAnswer(answer)
 
